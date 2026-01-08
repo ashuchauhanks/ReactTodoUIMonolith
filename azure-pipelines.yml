@@ -72,12 +72,20 @@ stages:
       inputs:
         targetType: 'inline'
         script: |
-          @"
-          /** @type {import('stylelint').Config} */
-          export default {
-            extends: ["stylelint-config-standard"]
-          };
-          "@ | Out-File -FilePath stylelint.config.mjs -Encoding utf8
+          if (-Not (Test-Path "stylelint.config.mjs")) {
+          
+                  $lines = @(
+                    "/** @type {import('stylelint').Config} */",
+                    "export default {",
+                    "  extends: [""stylelint-config-standard""]",
+                    "};"
+                  )
+          
+                  $lines | Out-File -FilePath stylelint.config.mjs -Encoding UTF8
+                }
+                else {
+                  Write-Host "stylelint.config.mjs already exists, skipping creation"
+                }
 
 
     - task: PowerShell@2
