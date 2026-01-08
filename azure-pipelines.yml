@@ -83,6 +83,7 @@ stages:
       inputs:
         targetType: 'inline'
         script: |
+          cd $(System.DefaultWorkingDirectory)
           npm add -D stylelint stylelint-config-standard
           npx stylelint "**/*.css"
 
