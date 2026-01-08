@@ -1,0 +1,127 @@
+
+trigger: none
+pool: selfhostagent
+
+# parameters:
+#   - 
+
+
+stages:
+
+# - stage: SoftwareComponentCompositionAnalysis
+#   displayName: Software Composition Analysis
+#   jobs:
+#   - job: securityvulnerabilityscan
+#     displayName: security scan (Retire.js)
+
+#     steps:
+#     - task: PowerShell@2
+#       displayName: security scan (Retire.js)
+#       inputs:
+#         targetType: 'inline'
+#         script: |
+#           npm install -g retire
+#           retire
+#           retire --exitwith 0
+
+
+# - stage: StaticCodeAnalysis
+#   displayName: Static Code Analysis
+#   jobs: 
+#   - job: SonarQubeAnalysis
+#     displayName: Static Code Analysis (SonarQube)
+#     steps:
+#     - task: PowerShell@2
+#       inputs:
+#         targetType: 'inline'
+#         script: 'sonar -D sonar.host.url=https://sonarqube.devopsinsiders.com/ -D sonar.token=$(SONAR_TOKEN) -D sonar.projectKey=todo-ui-frontend'
+
+
+- stage: CodeQualityCheck
+  displayName: Code Quality and Linting
+  # dependsOn: SoftwareComponentCompositionAnalysis
+  jobs:
+  - job: LintingCheck
+    displayName: Linting Check
+
+    steps: 
+
+    # - task: PowerShell@2
+    #   displayName: JavaScript Lint (Biome)
+    #   continueOnError: true
+    #   inputs:
+    #     targetType: 'inline'
+    #     script: |
+    #       Invoke-WebRequest -Uri "https://github.com/biomejs/biome/releases/download/%40biomejs%2Fbiome%402.3.11/biome-win32-x64.exe" -OutFile "$(Agent.ToolsDirectory)/biome.exe"
+    #       $(Agent.ToolsDirectory)/biome.exe lint $(System.DefaultWorkingDirectory)/src/
+
+    - task: NodeTool@0
+      displayName: 'Use Node.js'
+      inputs:
+        versionSource: 'spec'
+        versionSpec: '24.x'
+        checkLatest: true
+
+    - task: CmdLine@2
+      displayName: 'Install npm dependencies'
+      inputs:
+        script: 'npm install'
+
+
+    - task: PowerShell@2
+      inputs:
+        targetType: 'inline'
+        script: |
+          @"
+          /** @type {import('stylelint').Config} */
+          export default {
+            extends: ["stylelint-config-standard"]
+          };
+          "@ | Out-File -FilePath stylelint.config.mjs -Encoding utf8
+
+
+    - task: PowerShell@2
+      continueOnError: true
+      displayName: CSS Linting (Stylelint)
+      inputs:
+        targetType: 'inline'
+        script: |
+          
+          npm add -D stylelint stylelint-config-standard
+          npx stylelint "**/*.css"
+
+          
+          # npm create stylelint@latest
+          
+          # npm install -g stylelint
+          # npm install -g stylelint-config-standard        
+          # stylelint $(System.DefaultWorkingDirectory)/src --config stylelint.config.mjs
+
+    # - task: PowerShell@2
+    #   continueOnError: true
+    #   displayName: YAML Linting (yamllint)    
+    #   inputs:
+    #     targetType: 'inline'
+    #     script: |
+    #       pip install --user yamllint
+    #       yamllint $(System.DefaultWorkingDirectory)
+
+    # - task: PowerShell@2
+    #   continueOnError: true
+    #   displayName: Markdown Linting (markdownlint)      
+    #   inputs:
+    #     targetType: 'inline'
+    #     script: |
+    #       npm install -g markdownlint-cli      
+    #       markdownlint $(System.DefaultWorkingDirectory)/
+
+
+          
+
+
+
+
+
+
+
+
