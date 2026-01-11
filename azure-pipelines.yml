@@ -71,6 +71,7 @@ stages:
 
 
     - task: PowerShell@2
+      displayName: create file stylelint.config.mjs
       inputs:
         targetType: 'inline'
         script: |
