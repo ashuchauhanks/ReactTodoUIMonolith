@@ -1,5 +1,7 @@
 
 trigger: none
+# - develop
+
 pool: selfhostagent
 
 # parameters:
@@ -56,7 +58,7 @@ stages:
     #       $(Agent.ToolsDirectory)/biome.exe lint $(System.DefaultWorkingDirectory)/src/
 
     - task: NodeTool@0
-      displayName: 'Use Node.js'
+      displayName: 'Install Node.js'
       inputs:
         versionSource: 'spec'
         versionSpec: '24.x'
@@ -122,3 +124,72 @@ stages:
     #     script: |
     #       npm install -g markdownlint-cli      
     #       markdownlint $(System.DefaultWorkingDirectory)/
+
+
+
+
+- stage: BuildAndPackage
+  displayName: Build & Artifact Packaging
+  jobs:
+  - job: ApplicationBuild
+    displayName: Application Build
+    steps:
+
+    - task: NodeTool@0
+      displayName: Install Node.js
+      inputs:
+        versionSource: 'spec'
+        versionSpec: '16.x'
+
+    - task: PowerShell@2
+      displayName: Install dependency npm
+      inputs:
+        targetType: 'inline'
+        script: 'npm install'
+    - task: PowerShell@2
+      displayName: Application Build
+      inputs:
+        targetType: 'inline'
+        script: 'npm run build'
+
+    - task: PublishPipelineArtifact@1
+      inputs:
+        targetPath: '$(System.DefaultWorkingDirectory)/build/'
+        artifact: 'todo-frontend-ui'
+        publishLocation: 'pipeline'
+
+#     - task: PublishPipelineArtifact@1
+#       displayName: Publish Build Artifact
+#       inputs:
+#         targetPath: '$(System.DefaultWorkingDirectory)/build/'
+#         artifact: 'todo-ui'
+#         publishLocation: 'pipeline'
+
+
+# - stage: deployToDev
+#   condition: eq(variables['Build.SourceBranch'], 'refs/heads/develop')
+#   displayName: Deploy To Dev VM
+#   jobs:
+#   - job: deploy
+#     steps:
+#     - task: DownloadPipelineArtifact@2
+#       inputs:
+#         buildType: 'current'
+#         artifactName: 'todo-ui'
+#         targetPath: '$(System.DefaultWorkingDirectory)/build_artifacts'
+
+#     - task: CopyFilesOverSSH@0
+#       inputs:
+#         sshEndpoint: 'dev-vm'
+#         sourceFolder: '$(System.DefaultWorkingDirectory)/build_artifacts'
+#         contents: '**'
+#         targetFolder: '/home/devopsadmin/'
+#         cleanTargetFolder: true
+#         readyTimeout: '20000'
+
+#     - task: SSH@0
+#       inputs:
+#         sshEndpoint: 'dev-vm'
+#         runOptions: 'commands'
+#         commands: 'sudo cp -r /home/devopsadmin/* /var/www/html'
+#         readyTimeout: '20000'
