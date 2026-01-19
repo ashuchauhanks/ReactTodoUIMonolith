@@ -39,14 +39,14 @@ stages:
 #         script: 'sonar -D sonar.host.url=https://sonarqube.devopsinsiders.com/ -D sonar.token=$(SONAR_TOKEN) -D sonar.projectKey=todo-ui-frontend'
 
 
-- stage: CodeQualityCheck
-  displayName: Code Quality and Linting
-  # dependsOn: SoftwareComponentCompositionAnalysis
-  jobs:
-  - job: LintingCheck
-    displayName: Linting Check
+# - stage: CodeQualityCheck
+#   displayName: Code Quality and Linting
+#   dependsOn: SoftwareComponentCompositionAnalysis
+#   jobs:
+#   - job: LintingCheck
+#     displayName: Linting Check
 
-    steps: 
+#     steps: 
 
     # - task: PowerShell@2
     #   displayName: JavaScript Lint (Biome)
@@ -57,49 +57,49 @@ stages:
     #       Invoke-WebRequest -Uri "https://github.com/biomejs/biome/releases/download/%40biomejs%2Fbiome%402.3.11/biome-win32-x64.exe" -OutFile "$(Agent.ToolsDirectory)/biome.exe"
     #       $(Agent.ToolsDirectory)/biome.exe lint $(System.DefaultWorkingDirectory)/src/
 
-    - task: NodeTool@0
-      displayName: 'Install Node.js'
-      inputs:
-        versionSource: 'spec'
-        versionSpec: '24.x'
-        checkLatest: true
+    # - task: NodeTool@0
+    #   displayName: 'Install Node.js'
+    #   inputs:
+    #     versionSource: 'spec'
+    #     versionSpec: '24.x'
+    #     checkLatest: true
 
-    - task: CmdLine@2
-      displayName: 'Install npm dependencies'
-      inputs:
-        script: 'npm install'
+    # - task: CmdLine@2
+    #   displayName: 'Install npm dependencies'
+    #   inputs:
+    #     script: 'npm install'
 
 
-    - task: PowerShell@2
-      displayName: create file stylelint.config.mjs
-      inputs:
-        targetType: 'inline'
-        script: |
-          if (-Not (Test-Path "stylelint.config.mjs")) {
+    # - task: PowerShell@2
+    #   displayName: create file stylelint.config.mjs
+    #   inputs:
+    #     targetType: 'inline'
+    #     script: |
+    #       if (-Not (Test-Path "stylelint.config.mjs")) {
           
-                  $lines = @(
-                    "/** @type {import('stylelint').Config} */",
-                    "export default {",
-                    "  extends: [""stylelint-config-standard""]",
-                    "};"
-                  )
+    #               $lines = @(
+    #                 "/** @type {import('stylelint').Config} */",
+    #                 "export default {",
+    #                 "  extends: [""stylelint-config-standard""]",
+    #                 "};"
+    #               )
           
-                  $lines | Out-File -FilePath stylelint.config.mjs -Encoding UTF8
-                }
-                else {
-                  Write-Host "stylelint.config.mjs already exists, skipping creation"
-                }
+    #               $lines | Out-File -FilePath stylelint.config.mjs -Encoding UTF8
+    #             }
+    #             else {
+    #               Write-Host "stylelint.config.mjs already exists, skipping creation"
+    #             }
 
 
-    - task: PowerShell@2
-      continueOnError: true
-      displayName: CSS Linting (Stylelint)
-      inputs:
-        targetType: 'inline'
-        script: |
+    # - task: PowerShell@2
+    #   continueOnError: true
+    #   displayName: CSS Linting (Stylelint)
+    #   inputs:
+    #     targetType: 'inline'
+    #     script: |
           
-          npm add -D stylelint stylelint-config-standard
-          npx stylelint "**/*.css"
+    #       npm add -D stylelint stylelint-config-standard
+    #       npx stylelint "**/*.css"
 
           
           # npm create stylelint@latest
