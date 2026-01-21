@@ -154,6 +154,7 @@ stages:
         script: 'npm run build'
 
     - task: PublishPipelineArtifact@1
+      displayName: Publish Build Artifact
       inputs:
         targetPath: '$(System.DefaultWorkingDirectory)/build/'
         artifact: 'todo-frontend-ui'
@@ -196,19 +197,23 @@ stages:
 #         readyTimeout: '20000'
 
 
-    - task: DownloadPipelineArtifact@2
-      inputs:
-        buildType: 'specific'
-        project: 'e161fa95-0015-4b95-8e1b-439d8e5ff69e'
-        definition: '12'
-        buildVersionToDownload: 'specific'
-        pipelineId: '172'
-        artifactName: 'todo-frontend-ui'
-        targetPath: '$(System.DefaultWorkingDirectory)/build_artifacts'
+    # - task: DownloadPipelineArtifact@2
+    #   inputs:
+    #     buildType: 'specific'
+    #     project: 'e161fa95-0015-4b95-8e1b-439d8e5ff69e'
+    #     definition: '12'
+    #     buildVersionToDownload: 'specific'
+    #     pipelineId: '172'
+    #     artifactName: 'todo-frontend-ui'
+    #     targetPath: '$(System.DefaultWorkingDirectory)/build_artifacts'
 
     - task: DownloadPipelineArtifact@2
+      displayName: Download Build Artifact
       inputs:
         buildType: 'current'
         artifactName: 'todo-frontend-ui'
         targetPath: '$(System.DefaultWorkingDirectory)/build_artifacts'
+
+
+    
 
