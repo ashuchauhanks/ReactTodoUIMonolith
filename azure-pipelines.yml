@@ -225,19 +225,27 @@ stages:
         readyTimeout: '20000'
 
     - task: SSH@0
+      displayName: install nginx
+      inputs:
+        sshEndpoint: 'ssh serv conn- frontend vm'
+        runOptions: 'inline'
+        inline: |
+          sudo apt-get update -y || true
+          sudo apt-get install -y nginx
+          # sudo systemctl enable nginx
+          # sudo systemctl start nginx
+
+          exit 0
+        readyTimeout: '20000'
+
+    - task: SSH@0
       displayName: build copy to var/www/html
       inputs:
         sshEndpoint: 'ssh serv conn- frontend vm'
         runOptions: 'inline'
         inline: |
-          sudo apt update -y || true
-          sudo apt install -y nginx
-          # sudo systemctl enable nginx
-          # sudo systemctl start nginx
           sudo rm -rf /var/www/html/*
           sudo cp -r /home/ashuvm/* /var/www/html
-          exit 0
         readyTimeout: '20000'
 
     
-
