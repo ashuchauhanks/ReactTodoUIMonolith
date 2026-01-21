@@ -129,36 +129,36 @@ stages:
 
 
 
-- stage: BuildAndPackage
-  displayName: Build & Artifact Packaging
-  jobs:
-  - job: ApplicationBuild
-    displayName: Application Build
-    steps:
+# - stage: BuildAndPackage
+#   displayName: Build & Artifact Packaging
+#   jobs:
+#   - job: ApplicationBuild
+#     displayName: Application Build
+#     steps:
 
-    - task: NodeTool@0
-      displayName: Install Node.js
-      inputs:
-        versionSource: 'spec'
-        versionSpec: '16.x'
+#     - task: NodeTool@0
+#       displayName: Install Node.js
+#       inputs:
+#         versionSource: 'spec'
+#         versionSpec: '16.x'
 
-    - task: PowerShell@2
-      displayName: Install dependency npm
-      inputs:
-        targetType: 'inline'
-        script: 'npm install'
-    - task: PowerShell@2
-      displayName: Application Build
-      inputs:
-        targetType: 'inline'
-        script: 'npm run build'
+#     - task: PowerShell@2
+#       displayName: Install dependency npm
+#       inputs:
+#         targetType: 'inline'
+#         script: 'npm install'
+#     - task: PowerShell@2
+#       displayName: Application Build
+#       inputs:
+#         targetType: 'inline'
+#         script: 'npm run build'
 
-    - task: PublishPipelineArtifact@1
-      displayName: Publish Build Artifact
-      inputs:
-        targetPath: '$(System.DefaultWorkingDirectory)/build/'
-        artifact: 'todo-frontend-ui'
-        publishLocation: 'pipeline'
+#     - task: PublishPipelineArtifact@1
+#       displayName: Publish Build Artifact
+#       inputs:
+#         targetPath: '$(System.DefaultWorkingDirectory)/build/'
+#         artifact: 'todo-frontend-ui'
+#         publishLocation: 'pipeline'
 
 #     - task: PublishPipelineArtifact@1
 #       displayName: Publish Build Artifact
@@ -197,23 +197,43 @@ stages:
 #         readyTimeout: '20000'
 
 
-    # - task: DownloadPipelineArtifact@2
-    #   inputs:
-    #     buildType: 'specific'
-    #     project: 'e161fa95-0015-4b95-8e1b-439d8e5ff69e'
-    #     definition: '12'
-    #     buildVersionToDownload: 'specific'
-    #     pipelineId: '172'
-    #     artifactName: 'todo-frontend-ui'
-    #     targetPath: '$(System.DefaultWorkingDirectory)/build_artifacts'
-
     - task: DownloadPipelineArtifact@2
       displayName: Download Build Artifact
       inputs:
-        buildType: 'current'
+        buildType: 'specific'
+        project: 'e161fa95-0015-4b95-8e1b-439d8e5ff69e'
+        definition: '12'
+        buildVersionToDownload: 'specific'
+        pipelineId: '172'
         artifactName: 'todo-frontend-ui'
         targetPath: '$(System.DefaultWorkingDirectory)/build_artifacts'
 
+    # - task: DownloadPipelineArtifact@2
+    #   displayName: Download Build Artifact
+    #   inputs:
+    #     buildType: 'current'
+    #     artifactName: 'todo-frontend-ui'
+    #     targetPath: '$(System.DefaultWorkingDirectory)/build_artifacts'
+
+    - task: CopyFilesOverSSH@0
+      inputs:
+        sshEndpoint: 'ssh serv conn- frontend vm'
+        sourceFolder: '$(System.DefaultWorkingDirectory)/build_artifacts/'
+        contents: '**'
+        cleanTargetFolder: true
+        targetFolder: '/home/ashuvm'
+        readyTimeout: '20000'
+
+    - task: SSH@0
+      inputs:
+        sshEndpoint: 'ssh serv conn- frontend vm'
+        runOptions: 'inline'
+        inline: |
+          sudo apt update
+          sudo apt install nginx
+          sudo rm -r /var/www/html
+          sudo cp -r /home/ashuvm/* /var/www/html
+        readyTimeout: '20000'
 
     
 
