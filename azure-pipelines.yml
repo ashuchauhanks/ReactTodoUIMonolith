@@ -230,12 +230,16 @@ stages:
         sshEndpoint: 'ssh serv conn- frontend vm'
         runOptions: 'inline'
         inline: |
-          sudo apt-get update -y || true
-          sudo apt-get install -y nginx
-          # sudo systemctl enable nginx
-          # sudo systemctl start nginx
+          #!/bin/bash
+          set +e
+          export DEBIAN_FRONTEND=noninteractive
 
+          sudo apt-get update -y
+          sudo apt-get install -y nginx
+
+          sudo systemctl restart nginx
           exit 0
+
         readyTimeout: '20000'
 
     - task: SSH@0
