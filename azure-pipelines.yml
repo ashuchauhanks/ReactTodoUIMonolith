@@ -232,9 +232,9 @@ stages:
         inline: |
           sudo apt update -y
           sudo apt install -y nginx
-          sudo systemctl enable nginx
-          sudo systemctl start nginx
-          sudo rm -r /var/www/html
+          # sudo systemctl enable nginx
+          # sudo systemctl start nginx
+          sudo rm -rf /var/www/html/*
           sudo cp -r /home/ashuvm/* /var/www/html
         readyTimeout: '20000'
 
