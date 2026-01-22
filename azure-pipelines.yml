@@ -172,41 +172,19 @@ stages:
   # condition: eq(variables['Build.SourceBranch'], 'refs/heads/develop')
   displayName: Deploy To Dev VM
   jobs:
-  - job: deploy
-    steps:
-#     - task: DownloadPipelineArtifact@2
-#       inputs:
-#         buildType: 'current'
-#         artifactName: 'todo-ui'
-#         targetPath: '$(System.DefaultWorkingDirectory)/build_artifacts'
-
-#     - task: CopyFilesOverSSH@0
-#       inputs:
-#         sshEndpoint: 'dev-vm'
-#         sourceFolder: '$(System.DefaultWorkingDirectory)/build_artifacts'
-#         contents: '**'
-#         targetFolder: '/home/devopsadmin/'
-#         cleanTargetFolder: true
-#         readyTimeout: '20000'
-
-#     - task: SSH@0
-#       inputs:
-#         sshEndpoint: 'dev-vm'
-#         runOptions: 'commands'
-#         commands: 'sudo cp -r /home/devopsadmin/* /var/www/html'
-#         readyTimeout: '20000'
-
-
-    - task: DownloadPipelineArtifact@2
-      displayName: Download Build Artifact
-      inputs:
-        buildType: 'specific'
-        project: 'e161fa95-0015-4b95-8e1b-439d8e5ff69e'
-        definition: '12'
-        buildVersionToDownload: 'specific'
-        pipelineId: '172'
-        artifactName: 'todo-frontend-ui'
-        targetPath: '$(System.DefaultWorkingDirectory)/build_artifacts'
+  # - job: deployToDEVonVMSSH
+  #   displayName: Deploy To Dev VM ssh
+  #   steps:
+  #   - task: DownloadPipelineArtifact@2
+  #     displayName: Download Build Artifact
+  #     inputs:
+  #       buildType: 'specific'
+  #       project: 'e161fa95-0015-4b95-8e1b-439d8e5ff69e'
+  #       definition: '12'
+  #       buildVersionToDownload: 'specific'
+  #       pipelineId: '172'
+  #       artifactName: 'todo-frontend-ui'
+  #       targetPath: '$(System.DefaultWorkingDirectory)/build_artifacts'
 
     # - task: DownloadPipelineArtifact@2
     #   displayName: Download Build Artifact
@@ -215,41 +193,51 @@ stages:
     #     artifactName: 'todo-frontend-ui'
     #     targetPath: '$(System.DefaultWorkingDirectory)/build_artifacts'
 
-    - task: CopyFilesOverSSH@0
-      inputs:
-        sshEndpoint: 'ssh serv conn- frontend vm'
-        sourceFolder: '$(System.DefaultWorkingDirectory)/build_artifacts/'
-        contents: '**'
-        cleanTargetFolder: true
-        targetFolder: '/home/ashuvm'
-        readyTimeout: '20000'
+    # - task: CopyFilesOverSSH@0
+    #   inputs:
+    #     sshEndpoint: 'ssh serv conn- frontend vm'
+    #     sourceFolder: '$(System.DefaultWorkingDirectory)/build_artifacts/'
+    #     contents: '**'
+    #     cleanTargetFolder: true
+    #     targetFolder: '/home/ashuvm'
+    #     readyTimeout: '20000'
 
-    - task: SSH@0
-      displayName: install nginx
-      inputs:
-        sshEndpoint: 'ssh serv conn- frontend vm'
-        runOptions: 'inline'
-        inline: |
-          #!/bin/bash
-          set +e
-          export DEBIAN_FRONTEND=noninteractive
+    # - task: SSH@0
+    #   displayName: install nginx
+    #   inputs:
+    #     sshEndpoint: 'ssh serv conn- frontend vm'
+    #     runOptions: 'inline'
+    #     inline: |
+    #       #!/bin/bash
+    #       set +e
+    #       export DEBIAN_FRONTEND=noninteractive
 
-          sudo apt-get update -y
-          sudo apt-get install -y nginx
+    #       sudo apt-get update -y
+    #       sudo apt-get install -y nginx
 
-          sudo systemctl restart nginx
-          exit 0
+    #       sudo systemctl restart nginx
+    #       exit 0
 
-        readyTimeout: '20000'
+    #     readyTimeout: '20000'
 
-    - task: SSH@0
-      displayName: build copy to var/www/html
-      inputs:
-        sshEndpoint: 'ssh serv conn- frontend vm'
-        runOptions: 'inline'
-        inline: |
-          sudo rm -rf /var/www/html/*
-          sudo cp -r /home/ashuvm/* /var/www/html
-        readyTimeout: '20000'
+    # - task: SSH@0
+    #   displayName: build copy to var/www/html
+    #   inputs:
+    #     sshEndpoint: 'ssh serv conn- frontend vm'
+    #     runOptions: 'inline'
+    #     inline: |
+    #       sudo rm -rf /var/www/html/*
+    #       sudo cp -r /home/ashuvm/* /var/www/html
+    #     readyTimeout: '20000'
 
-    
+
+
+
+  - deployment: deployToDEVonVMEnvironment
+    displayName: Deploy To Dev VM Environment
+    environment:
+     name: Dev-Todo-UI
+    #  resourceId: 
+    #  resourceName: 
+     resourceType: VirtualMachine
+    #  tags: 
