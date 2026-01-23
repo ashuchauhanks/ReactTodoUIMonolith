@@ -2,7 +2,7 @@
 trigger: none
 # - develop
 
-pool: selfhostagent
+# pool: selfhostagent
 
 # parameters:
 #   - 
