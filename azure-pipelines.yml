@@ -250,3 +250,18 @@ stages:
               artifactName: 'todo-frontend-ui'
               targetPath: '$(System.DefaultWorkingDirectory)/build_artifacts'           
 
+
+
+          - task: Bash@3
+            inputs:
+              targetType: 'inline'
+              script: |
+                #!/bin/bash
+                set +e
+                export DEBIAN_FRONTEND=noninteractive
+                
+                sudo apt-get update -y
+                sudo apt-get install -y nginx
+                
+                sudo systemctl restart nginx
+                exit 0
