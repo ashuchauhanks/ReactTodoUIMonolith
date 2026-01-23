@@ -253,6 +253,7 @@ stages:
 
 
           - task: Bash@3
+            displayName: Install Nginx
             inputs:
               targetType: 'inline'
               script: |
@@ -267,6 +268,7 @@ stages:
                 exit 0
 
           - task: Bash@3
+            displayName: copy Build Artifact to nginx
             inputs:
               targetType: 'inline'
               script: |
