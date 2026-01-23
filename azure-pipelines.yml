@@ -160,12 +160,6 @@ stages:
 #         artifact: 'todo-frontend-ui'
 #         publishLocation: 'pipeline'
 
-#     - task: PublishPipelineArtifact@1
-#       displayName: Publish Build Artifact
-#       inputs:
-#         targetPath: '$(System.DefaultWorkingDirectory)/build/'
-#         artifact: 'todo-ui'
-#         publishLocation: 'pipeline'
 
 
 - stage: deployToDev
@@ -175,16 +169,16 @@ stages:
   # - job: deployToDEVonVMSSH
   #   displayName: Deploy To Dev VM ssh
   #   steps:
-  #   - task: DownloadPipelineArtifact@2
-  #     displayName: Download Build Artifact
-  #     inputs:
-  #       buildType: 'specific'
-  #       project: 'e161fa95-0015-4b95-8e1b-439d8e5ff69e'
-  #       definition: '12'
-  #       buildVersionToDownload: 'specific'
-  #       pipelineId: '172'
-  #       artifactName: 'todo-frontend-ui'
-  #       targetPath: '$(System.DefaultWorkingDirectory)/build_artifacts'
+    # - task: DownloadPipelineArtifact@2
+    #   displayName: Download Build Artifact
+    #   inputs:
+    #     buildType: 'specific'
+    #     project: 'e161fa95-0015-4b95-8e1b-439d8e5ff69e'
+    #     definition: '12'
+    #     buildVersionToDownload: 'specific'
+    #     pipelineId: '172'
+    #     artifactName: 'todo-frontend-ui'
+    #     targetPath: '$(System.DefaultWorkingDirectory)/build_artifacts'
 
     # - task: DownloadPipelineArtifact@2
     #   displayName: Download Build Artifact
@@ -241,3 +235,18 @@ stages:
     #  resourceName: 
      resourceType: VirtualMachine
     #  tags: 
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - task: DownloadPipelineArtifact@2
+            displayName: Download Build Artifact
+            inputs:
+              buildType: 'specific'
+              project: 'e161fa95-0015-4b95-8e1b-439d8e5ff69e'
+              definition: '12'
+              buildVersionToDownload: 'specific'
+              pipelineId: '172'
+              artifactName: 'todo-frontend-ui'
+              targetPath: '$(System.DefaultWorkingDirectory)/build_artifacts'           
+
