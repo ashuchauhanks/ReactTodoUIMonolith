@@ -271,4 +271,4 @@ stages:
               targetType: 'inline'
               script: |
                 sudo rm -rf /var/www/html/*
-                sudo cp -r $(System.DefaultWorkingDirectory)/build_artifacts/* /var/www/html'
+                sudo cp -r $(System.DefaultWorkingDirectory)/build_artifacts/* /var/www/html
