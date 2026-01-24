@@ -1,8 +1,8 @@
 
-trigger: none
-  # branches:
-  #   include:
-  #     - develop
+trigger: 
+  branches:
+    include:
+      - develop
   #     - main
   #     - feature/*
 
