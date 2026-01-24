@@ -1,15 +1,15 @@
 
-trigger: 
-  branches:
-    include:
-      - develop
-      - main
-      - feature/*
+trigger: none
+  # branches:
+  #   include:
+  #     - develop
+  #     - main
+  #     - feature/*
 
 # pr:
 #   branches:
 #     include:
-#     - features/*
+#     - develop
 
 # pool: selfhostagent
 
