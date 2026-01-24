@@ -6,10 +6,10 @@ trigger: none
   #     - main
   #     - feature/*
 
-pr:
-  branches:
-    include:
-    - develop
+# pr:
+#   branches:
+#     include:
+#     - develop
 
 # pool: selfhostagent
 
