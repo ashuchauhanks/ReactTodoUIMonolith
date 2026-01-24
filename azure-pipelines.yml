@@ -1,6 +1,15 @@
 
-trigger: none
-# - develop
+trigger: 
+  branches:
+    include:
+      - develop
+      - main
+      - feature/*
+
+# pr:
+#   branches:
+#     include:
+#     - features/*
 
 # pool: selfhostagent
 
@@ -163,7 +172,7 @@ stages:
 
 
 - stage: deployToDev
-  # condition: eq(variables['Build.SourceBranch'], 'refs/heads/develop')
+  condition: eq(variables['Build.SourceBranch'], 'refs/heads/develop')
   displayName: Deploy To Dev VM
   jobs:
   # - job: deployToDEVonVMSSH
