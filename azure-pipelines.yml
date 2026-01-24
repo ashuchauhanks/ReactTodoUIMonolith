@@ -1,6 +1,11 @@
 
-trigger: none
-# - develop
+trigger: 
+  branches:
+    include:
+      - develop
+      - main
+      - feature/*
+
 
 # pool: selfhostagent
 
