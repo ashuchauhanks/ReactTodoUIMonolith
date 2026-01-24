@@ -172,7 +172,7 @@ stages:
 
 
 - stage: deployToDev
-  condition: eq(variables['Build.SourceBranch'], 'refs/heads/main')
+  condition: eq(variables['Build.SourceBranch'], 'refs/heads/develop')
   displayName: Deploy To Dev VM
   jobs:
   # - job: deployToDEVonVMSSH
