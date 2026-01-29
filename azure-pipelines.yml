@@ -3,14 +3,14 @@ trigger:
   branches:
     include:
       - develop
-  #     - main
-  #     - feature/*
+      - main
+      - feature/*
 
 
-# pr:
-#   branches:
-#     include:
-#     - develop
+pr:
+  branches:
+    include:
+    - develop
 
 pool: selfhostagent
 
@@ -38,6 +38,7 @@ stages:
 
 - stage: StaticCodeAnalysis
   displayName: Static Code Analysis
+
   jobs: 
   - job: SonarQubeAnalysis
     displayName: Static Code Analysis (SonarQube)
@@ -56,7 +57,7 @@ stages:
 
 - stage: CodeQualityCheck
   displayName: Code Quality and Linting
-  dependsOn: SoftwareComponentCompositionAnalysis
+  # dependsOn: SoftwareComponentCompositionAnalysis
   jobs:
   - job: LintingCheck
     displayName: Linting Check
@@ -130,14 +131,15 @@ stages:
           $env:Path += ";$env:APPDATA\Python\Python313\Scripts"
           yamllint $(System.DefaultWorkingDirectory); exit 0
 
-    # - task: PowerShell@2
-    #   continueOnError: true
-    #   displayName: Markdown Linting (markdownlint)      
-    #   inputs:
-    #     targetType: 'inline'
-    #     script: |
-    #       npm install -g markdownlint-cli      
-    #       markdownlint $(System.DefaultWorkingDirectory)/
+    - task: PowerShell@2
+      continueOnError: true
+      displayName: Markdown Linting (markdownlint)      
+      inputs:
+        targetType: 'inline'
+        script: |
+          npm install -g markdownlint-cli      
+          markdownlint $(System.DefaultWorkingDirectory)/
+          exit 0
 
 
 
