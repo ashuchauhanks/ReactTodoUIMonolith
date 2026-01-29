@@ -49,7 +49,9 @@ stages:
     - task: PowerShell@2
       inputs:
         targetType: 'inline'
-        script: 'sonar-scanner -Dsonar.host.url=http://localhost:9000 -Dsonar.login=sqp_9bf0e3980510e1aa1e7a2207db47d34eba3d75b9 -Dsonar.projectKey=TodoApp -Dsonar.sources=src'
+        script: 'sonar-scanner --% -Dsonar.host.url=http://localhost:9000 -Dsonar.login=sqp_9bf0e3980510e1aa1e7a2207db47d34eba3d75b9 -Dsonar.projectKey=TodoApp -Dsonar.sources=src'
+
+
 
 # - stage: CodeQualityCheck
 #   displayName: Code Quality and Linting
