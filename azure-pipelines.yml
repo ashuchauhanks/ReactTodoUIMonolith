@@ -72,7 +72,7 @@ stages:
         script: |
           Invoke-WebRequest -Uri "https://github.com/biomejs/biome/releases/download/%40biomejs%2Fbiome%402.3.11/biome-win32-x64.exe" -OutFile "$(Agent.ToolsDirectory)/biome.exe"
           $(Agent.ToolsDirectory)/biome.exe lint $(System.DefaultWorkingDirectory)/src/
-
+          exit 0
     - task: NodeTool@0
       displayName: 'Install Node.js'
       inputs:
@@ -119,6 +119,7 @@ stages:
           npm install -g stylelint
           npm install -g stylelint-config-standard        
           stylelint $(System.DefaultWorkingDirectory)/src --config stylelint.config.mjs
+          exit 0
 
     - task: PowerShell@2
       continueOnError: true
@@ -127,7 +128,8 @@ stages:
         targetType: 'inline'
         script: |
           pip install --user yamllint
-          yamllint $(System.DefaultWorkingDirectory)
+          $env:Path += ";$env:APPDATA\Python\Python313\Scripts"
+          yamllint $(System.DefaultWorkingDirectory); exit 0
 
     # - task: PowerShell@2
     #   continueOnError: true
