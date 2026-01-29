@@ -19,21 +19,21 @@ pool: selfhostagent
 
 stages:
 
-# - stage: SoftwareComponentCompositionAnalysis
-#   displayName: Software Composition Analysis
-#   jobs:
-#   - job: securityvulnerabilityscan
-#     displayName: security scan (Retire.js)
+- stage: SoftwareComponentCompositionAnalysis
+  displayName: Software Composition Analysis
+  jobs:
+  - job: securityvulnerabilityscan
+    displayName: security scan (Retire.js)
 
-#     steps:
-#     - task: PowerShell@2
-#       displayName: security scan (Retire.js)
-#       inputs:
-#         targetType: 'inline'
-#         script: |
-#           npm install -g retire
-#           retire
-#           retire --exitwith 0
+    steps:
+    - task: PowerShell@2
+      displayName: security scan (Retire.js)
+      inputs:
+        targetType: 'inline'
+        script: |
+          npm install -g retire
+          retire
+          retire --exitwith 0
 
 
 - stage: StaticCodeAnalysis
@@ -47,89 +47,86 @@ stages:
     #     targetType: 'inline'
         # script: 'sonar -D sonar.host.url=https://sonarqube.devopsinsiders.com/ -D sonar.token=$(SONAR_TOKEN) -D sonar.projectKey=todo-ui-frontend'
     - task: PowerShell@2
+      displayName: Static Code Analysis (SonarQube)
       inputs:
         targetType: 'inline'
         script: 'sonar-scanner --% -Dsonar.host.url=http://localhost:9000 -Dsonar.login=sqp_9bf0e3980510e1aa1e7a2207db47d34eba3d75b9 -Dsonar.projectKey=TodoApp -Dsonar.sources=src'
 
 
 
-# - stage: CodeQualityCheck
-#   displayName: Code Quality and Linting
-#   dependsOn: SoftwareComponentCompositionAnalysis
-#   jobs:
-#   - job: LintingCheck
-#     displayName: Linting Check
+- stage: CodeQualityCheck
+  displayName: Code Quality and Linting
+  dependsOn: SoftwareComponentCompositionAnalysis
+  jobs:
+  - job: LintingCheck
+    displayName: Linting Check
 
-#     steps: 
+    steps: 
 
-    # - task: PowerShell@2
-    #   displayName: JavaScript Lint (Biome)
-    #   continueOnError: true
-    #   inputs:
-    #     targetType: 'inline'
-    #     script: |
-    #       Invoke-WebRequest -Uri "https://github.com/biomejs/biome/releases/download/%40biomejs%2Fbiome%402.3.11/biome-win32-x64.exe" -OutFile "$(Agent.ToolsDirectory)/biome.exe"
-    #       $(Agent.ToolsDirectory)/biome.exe lint $(System.DefaultWorkingDirectory)/src/
+    - task: PowerShell@2
+      displayName: JavaScript Lint (Biome)
+      continueOnError: true
+      inputs:
+        targetType: 'inline'
+        script: |
+          Invoke-WebRequest -Uri "https://github.com/biomejs/biome/releases/download/%40biomejs%2Fbiome%402.3.11/biome-win32-x64.exe" -OutFile "$(Agent.ToolsDirectory)/biome.exe"
+          $(Agent.ToolsDirectory)/biome.exe lint $(System.DefaultWorkingDirectory)/src/
 
-    # - task: NodeTool@0
-    #   displayName: 'Install Node.js'
-    #   inputs:
-    #     versionSource: 'spec'
-    #     versionSpec: '24.x'
-    #     checkLatest: true
+    - task: NodeTool@0
+      displayName: 'Install Node.js'
+      inputs:
+        versionSource: 'spec'
+        versionSpec: '24.x'
+        checkLatest: true
 
-    # - task: CmdLine@2
-    #   displayName: 'Install npm dependencies'
-    #   inputs:
-    #     script: 'npm install'
+    - task: CmdLine@2
+      displayName: 'Install npm dependencies'
+      inputs:
+        script: 'npm install'
 
 
-    # - task: PowerShell@2
-    #   displayName: create file stylelint.config.mjs
-    #   inputs:
-    #     targetType: 'inline'
-    #     script: |
-    #       if (-Not (Test-Path "stylelint.config.mjs")) {
+    - task: PowerShell@2
+      displayName: create file stylelint.config.mjs
+      inputs:
+        targetType: 'inline'
+        script: |
+          if (-Not (Test-Path "stylelint.config.mjs")) {
           
-    #               $lines = @(
-    #                 "/** @type {import('stylelint').Config} */",
-    #                 "export default {",
-    #                 "  extends: [""stylelint-config-standard""]",
-    #                 "};"
-    #               )
+                  $lines = @(
+                    "/** @type {import('stylelint').Config} */",
+                    "export default {",
+                    "  extends: [""stylelint-config-standard""]",
+                    "};"
+                  )
           
-    #               $lines | Out-File -FilePath stylelint.config.mjs -Encoding UTF8
-    #             }
-    #             else {
-    #               Write-Host "stylelint.config.mjs already exists, skipping creation"
-    #             }
+                  $lines | Out-File -FilePath stylelint.config.mjs -Encoding UTF8
+                }
+                else {
+                  Write-Host "stylelint.config.mjs already exists, skipping creation"
+                }
 
 
-    # - task: PowerShell@2
-    #   continueOnError: true
-    #   displayName: CSS Linting (Stylelint)
-    #   inputs:
-    #     targetType: 'inline'
-    #     script: |
-          
-    #       npm add -D stylelint stylelint-config-standard
-    #       npx stylelint "**/*.css"
+    - task: PowerShell@2
+      continueOnError: true
+      displayName: CSS Linting (Stylelint)
+      inputs:
+        targetType: 'inline'
+        script: |
+          # npm add -D stylelint stylelint-config-standard
+          # npx stylelint "**/*.css"
+          npm create stylelint@latest
+          npm install -g stylelint
+          npm install -g stylelint-config-standard        
+          stylelint $(System.DefaultWorkingDirectory)/src --config stylelint.config.mjs
 
-          
-          # npm create stylelint@latest
-          
-          # npm install -g stylelint
-          # npm install -g stylelint-config-standard        
-          # stylelint $(System.DefaultWorkingDirectory)/src --config stylelint.config.mjs
-
-    # - task: PowerShell@2
-    #   continueOnError: true
-    #   displayName: YAML Linting (yamllint)    
-    #   inputs:
-    #     targetType: 'inline'
-    #     script: |
-    #       pip install --user yamllint
-    #       yamllint $(System.DefaultWorkingDirectory)
+    - task: PowerShell@2
+      continueOnError: true
+      displayName: YAML Linting (yamllint)    
+      inputs:
+        targetType: 'inline'
+        script: |
+          pip install --user yamllint
+          yamllint $(System.DefaultWorkingDirectory)
 
     # - task: PowerShell@2
     #   continueOnError: true
@@ -143,43 +140,43 @@ stages:
 
 
 
-# - stage: BuildAndPackage
-#   displayName: Build & Artifact Packaging
-#   jobs:
-#   - job: ApplicationBuild
-#     displayName: Application Build
-#     steps:
+- stage: BuildAndPackage
+  displayName: Build & Artifact Packaging
+  jobs:
+  - job: ApplicationBuild
+    displayName: Application Build
+    steps:
 
-#     - task: NodeTool@0
-#       displayName: Install Node.js
-#       inputs:
-#         versionSource: 'spec'
-#         versionSpec: '16.x'
+    - task: NodeTool@0
+      displayName: Install Node.js
+      inputs:
+        versionSource: 'spec'
+        versionSpec: '16.x'
 
-#     - task: PowerShell@2
-#       displayName: Install dependency npm
-#       inputs:
-#         targetType: 'inline'
-#         script: 'npm install'
-#     - task: PowerShell@2
-#       displayName: Application Build
-#       inputs:
-#         targetType: 'inline'
-#         script: 'npm run build'
+    - task: PowerShell@2
+      displayName: Install dependency npm
+      inputs:
+        targetType: 'inline'
+        script: 'npm install'
+    - task: PowerShell@2
+      displayName: Application Build
+      inputs:
+        targetType: 'inline'
+        script: 'npm run build'
 
-#     - task: PublishPipelineArtifact@1
-#       displayName: Publish Build Artifact
-#       inputs:
-#         targetPath: '$(System.DefaultWorkingDirectory)/build/'
-#         artifact: 'todo-frontend-ui'
-#         publishLocation: 'pipeline'
+    - task: PublishPipelineArtifact@1
+      displayName: Publish Build Artifact
+      inputs:
+        targetPath: '$(System.DefaultWorkingDirectory)/build/'
+        artifact: 'todo-frontend-ui'
+        publishLocation: 'pipeline'
 
 
 
-# - stage: deployToDev
-#   condition: eq(variables['Build.SourceBranch'], 'refs/heads/develop')
-#   displayName: Deploy To Dev VM
-#   jobs:
+- stage: deployToDev
+  condition: eq(variables['Build.SourceBranch'], 'refs/heads/develop')
+  displayName: Deploy To Dev VM
+  jobs:
   # - job: deployToDEVonVMSSH
   #   displayName: Deploy To Dev VM ssh
   #   steps:
@@ -241,50 +238,50 @@ stages:
 
 
 
-  # - deployment: deployToDEVonVMEnvironment
-  #   displayName: Deploy To Dev VM Environment
-  #   environment:
-  #    name: Dev-Todo-UI
-  #   #  resourceId: 
-  #   #  resourceName: 
-  #    resourceType: VirtualMachine
-  #   #  tags: 
-  #   strategy:
-  #     runOnce:
-  #       deploy:
-  #         steps:
-  #         - task: DownloadPipelineArtifact@2
-  #           displayName: Download Build Artifact
-  #           inputs:
-  #             buildType: 'specific'
-  #             project: 'e161fa95-0015-4b95-8e1b-439d8e5ff69e'
-  #             definition: '12'
-  #             buildVersionToDownload: 'specific'
-  #             pipelineId: '172'
-  #             artifactName: 'todo-frontend-ui'
-  #             targetPath: '$(System.DefaultWorkingDirectory)/build_artifacts'           
+  - deployment: deployToDEVonVMEnvironment
+    displayName: Deploy To Dev VM Environment
+    environment:
+     name: Dev-Todo-UI
+    #  resourceId: 
+    #  resourceName: 
+     resourceType: VirtualMachine
+    #  tags: 
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - task: DownloadPipelineArtifact@2
+            displayName: Download Build Artifact
+            inputs:
+              buildType: 'specific'
+              project: 'e161fa95-0015-4b95-8e1b-439d8e5ff69e'
+              definition: '12'
+              buildVersionToDownload: 'specific'
+              pipelineId: '172'
+              artifactName: 'todo-frontend-ui'
+              targetPath: '$(System.DefaultWorkingDirectory)/build_artifacts'           
 
 
 
-  #         - task: Bash@3
-  #           displayName: Install Nginx
-  #           inputs:
-  #             targetType: 'inline'
-  #             script: |
-  #               #!/bin/bash
-  #               set +e
-  #               export DEBIAN_FRONTEND=noninteractive
+          - task: Bash@3
+            displayName: Install Nginx
+            inputs:
+              targetType: 'inline'
+              script: |
+                #!/bin/bash
+                set +e
+                export DEBIAN_FRONTEND=noninteractive
                 
-  #               sudo apt-get update -y
-  #               sudo apt-get install -y nginx
+                sudo apt-get update -y
+                sudo apt-get install -y nginx
                 
-  #               sudo systemctl restart nginx
-  #               exit 0
+                sudo systemctl restart nginx
+                exit 0
 
-  #         - task: Bash@3
-  #           displayName: copy Build Artifact to nginx
-  #           inputs:
-  #             targetType: 'inline'
-  #             script: |
-  #               sudo rm -rf /var/www/html/*
-  #               sudo cp -r $(System.DefaultWorkingDirectory)/build_artifacts/* /var/www/html
+          - task: Bash@3
+            displayName: copy Build Artifact to nginx
+            inputs:
+              targetType: 'inline'
+              script: |
+                sudo rm -rf /var/www/html/*
+                sudo cp -r $(System.DefaultWorkingDirectory)/build_artifacts/* /var/www/html
